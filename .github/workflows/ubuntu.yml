@@ -59,7 +59,7 @@ jobs:
     name: ${{ matrix.architecture.platform }}/${{ matrix.config.os }} [ ${{ matrix.config.env.CC }}, scope ${{ matrix.setup.scope }}, ${{ matrix.config.build_type }} ${{ matrix.config.extra_opts }} ]
     runs-on: ${{ matrix.architecture.host }}
     container:
-      image: 'ghcr.io/malpleneco/tebako-${{ matrix.config.os }}-dev'
+      image: 'ghcr.io/malpleneco/malpleneco-${{ matrix.config.os }}-dev'
     strategy:
       fail-fast: false
       matrix:
