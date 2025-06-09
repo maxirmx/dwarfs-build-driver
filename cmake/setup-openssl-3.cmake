@@ -40,6 +40,7 @@ if(OPENSSL_RES EQUAL 0)
   if((${OPENSSL_VER} VERSION_GREATER_EQUAL "3.0.0"))
     set(WITH_OPENSSL_BUILD OFF)
     set(OPENSSL_ROOT_DIR "${DEPS}")
+    set(OPENSSL_OPTION "-DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}")
   endif((${OPENSSL_VER} VERSION_GREATER_EQUAL "3.0.0"))
 endif(OPENSSL_RES EQUAL 0)
 
@@ -87,10 +88,11 @@ if(WITH_OPENSSL_BUILD)
     CONFIGURE_COMMAND   ${GNU_BASH} -c "${OPENSSL_SOURCE_DIR}/config          \
                                                         --openssldir=${DEPS}  \
                                                         --prefix=${DEPS}      \
-                                                        no-shared"
+                                                        --libdir=${DEPS}/lib"  
     BUILD_BYPRODUCTS ${__LIBSSL} ${__LIBCRYPTO}
   )
 
   set(OPENSSL_ROOT_DIR "${DEPS}")
+  set(OPENSSL_OPTION "-DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}")
 
 endif(WITH_OPENSSL_BUILD)

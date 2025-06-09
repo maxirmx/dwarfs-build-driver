@@ -49,3 +49,32 @@ include(ExternalProject)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(def-external-project)
 include(setup-openssl-3)
+include(setup-libarchive)
+include(setup-libfmt)
+include(setup-libxxhash)
+include(setup-parallelhashmap)
+include(setup-librange-v3)
+include(setup-libhowardhinnantdate)
+include(setup-libutfcpp)
+
+def_ext_prj_g(DWARFS "v0.12.4")
+
+ExternalProject_Add(${DWARFS_PRJ}
+    PREFIX ${DEPS}
+    GIT_REPOSITORY "https://github.com/mhx/dwarfs.git"
+    GIT_TAG ${DWARFS_TAG}
+    UPDATE_COMMAND ""
+    SOURCE_DIR ${DWARFS_SOURCE_DIR}
+    BINARY_DIR ${DWARFS_BINARY_DIR}
+    CMAKE_ARGS -GNinja 
+               -DCMAKE_INSTALL_PREFIX=${DEPS}
+               -DCMAKE_PREFIX_PATH=${DEPS} 
+               -DWITH_TESTS=OFF
+               -DWITH_LIBDWARFS=ON
+               -DWITH_TOOLS=ON
+               -DWITH_FUSE_DRIVER=OFF
+               -DWITH_MAN_PAGES=OFF
+               -DWITH_MAN_OPTION=OFF
+               -DSTATIC_BUILD_DO_NOT_USE=OFF
+               ${OPENSSL_OPTION}
+)
