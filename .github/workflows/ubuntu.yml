@@ -89,7 +89,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: cmake -B build -DCMAKE_BUID_TYPE=${{ matrix.config.env }} -DEXTRA_OPTS=${{ matrix.config.extra_opts }}  
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.config.env }} -DEXTRA_OPTS=${{ matrix.config.extra_opts }}  
 
       - name: Build
         run: cmake --build build

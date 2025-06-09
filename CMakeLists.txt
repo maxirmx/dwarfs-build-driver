@@ -68,7 +68,7 @@ ExternalProject_Add(${DWARFS_PRJ}
     BINARY_DIR ${DWARFS_BINARY_DIR}
     CMAKE_ARGS -GNinja 
                -DCMAKE_INSTALL_PREFIX=${DEPS}
-               -DCMAKE_PREFIX_PATH=${DEPS} 
+               -DCMAKE_PREFIX_PATH=${DEPS};/usr/local 
                -DWITH_TESTS=OFF
                -DWITH_LIBDWARFS=ON
                -DWITH_TOOLS=ON
