@@ -67,7 +67,7 @@ jobs:
           - { host: 'ubuntu-22.04', platform: linux/amd64 }
           - { host: 'ubuntu-22.04-arm', platform: linux/arm64 }
         config:
-          - { os: ubuntu-20.04, env: { CC: gcc-12,   CXX: g++-12     }, build_type: Release, extra_opts: '' }
+          - { os: ubuntu-20.04, env: { CC: gcc-11,   CXX: g++-11     }, build_type: Release, extra_opts: '' }
           - { os: ubuntu-20.04, env: { CC: clang-14, CXX: clang++-14 }, build_type: Release, extra_opts: '' }
 
         include:
@@ -89,7 +89,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: cmake -B build    
+        run: cmake -B build -DCMAKE_BUID_TYPE=${{ matrix.config.env }} -DEXTRA_OPTS=${{ matrix.config.extra_opts }}  
 
       - name: Build
         run: cmake --build build

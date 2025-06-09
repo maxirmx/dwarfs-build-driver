@@ -76,5 +76,7 @@ ExternalProject_Add(${DWARFS_PRJ}
                -DWITH_MAN_PAGES=OFF
                -DWITH_MAN_OPTION=OFF
                -DSTATIC_BUILD_DO_NOT_USE=OFF
+               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                ${OPENSSL_OPTION}
+               ${EXTRA_OPTS}
 )
