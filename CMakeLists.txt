@@ -55,6 +55,7 @@ include(setup-libxxhash)
 include(setup-parallelhashmap)
 include(setup-librange-v3)
 include(setup-libhowardhinnantdate)
+include(setup-nlohmann-json)
 include(setup-libutfcpp)
 
 def_ext_prj_g(DWARFS "v0.12.4")
@@ -68,7 +69,7 @@ ExternalProject_Add(${DWARFS_PRJ}
     BINARY_DIR ${DWARFS_BINARY_DIR}
     CMAKE_ARGS -GNinja 
                -DCMAKE_INSTALL_PREFIX=${DEPS}
-               -DCMAKE_PREFIX_PATH=${DEPS};/usr/local 
+               -DCMAKE_PREFIX_PATH=${DEPS} 
                -DWITH_TESTS=OFF
                -DWITH_LIBDWARFS=ON
                -DWITH_TOOLS=ON
@@ -79,4 +80,14 @@ ExternalProject_Add(${DWARFS_PRJ}
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                ${OPENSSL_OPTION}
                ${EXTRA_OPTS}
+    DEPENDS ${NLOHMANN_JSON_PRJ} 
+            ${LIBARCHIVE_PRJ} 
+            ${LIBFMT_PRJ} 
+            ${LIBXXHASH_PRJ} 
+            ${PARALLEL_HASHMAP_PRJ} 
+            ${RANGE_V3_PRJ} 
+            ${HOWARDHINNANT_DATE_PRJ} 
+            ${UTFCPP_PRJ}              
+            ${LIBUTFCPP_PRJ}
+            ${OPENSSL_PRJ}
 )
