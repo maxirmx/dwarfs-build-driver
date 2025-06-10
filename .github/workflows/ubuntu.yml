@@ -1,0 +1,96 @@
+# Copyright (c) 2025, [Maxim Samsonov](https://www.sw.consulting).
+# Copyright (c) 2021-2023, [Ribose Inc](https://www.ribose.com).
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+
+name: Ubuntu
+
+on:
+  schedule:
+    - cron: "0 6 * * 6"
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - '**.adoc'
+      - '**.md'
+      - '.github/workflows/*.yml'
+      - '!.github/workflows/ubuntu.yml'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**.adoc'
+      - '**.md'
+      - '.github/workflows/*.yml'
+      - '!.github/workflows/ubuntu.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.job }}-${{ github.head_ref || github.ref_name }}'
+  cancel-in-progress: true
+  
+env:
+  CCACHE_FLD: ccache
+  RUBY_VER: 3.4
+
+jobs:
+  build:
+    name: ${{ matrix.architecture.platform }}/${{ matrix.config.os }} [ ${{ matrix.config.env.CC }}, scope ${{ matrix.setup.scope }}, ${{ matrix.config.build_type }} ${{ matrix.config.extra_opts }} ]
+    runs-on: ${{ matrix.architecture.host }}
+    container:
+      image: 'ghcr.io/malpeneco/malpeneco-${{ matrix.config.os }}-dev' 
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture:
+          - { host: 'ubuntu-22.04', platform: linux/amd64 }
+          - { host: 'ubuntu-22.04-arm', platform: linux/arm64 }
+        config:
+          - { os: ubuntu-20.04, env: { CC: gcc-11,   CXX: g++-11     }, build_type: Release, extra_opts: '' }
+          - { os: ubuntu-20.04, env: { CC: clang-14, CXX: clang++-14 }, build_type: Release, extra_opts: '' }
+
+        include:
+          - config:       { os: ubuntu-20.04, env: { CC: clang-14, CXX: clang++-14 }, build_type: RelWithDebInfo, extra_opts: '-DENABLE_ASAN=1' }
+            setup:        { scope: 'ALL', tests: 'ON'  }
+            architecture: { host: 'ubuntu-22.04', platform: linux/amd64 }
+          - config:       { os: ubuntu-20.04, env: { CC: clang-14, CXX: clang++-14 }, build_type: RelWithDebInfo, extra_opts: '-DENABLE_TSAN=1' }
+            setup:        { scope: 'ALL', tests: 'ON'  }
+            architecture: { host: 'ubuntu-22.04', platform: linux/amd64 }
+          - config:       { os: ubuntu-20.04, env: { CC: clang-14, CXX: clang++-14 }, build_type: RelWithDebInfo, extra_opts: '-DENABLE_UBSAN=1' }
+            setup:        { scope: 'ALL', tests: 'ON'  }
+            architecture: { host: 'ubuntu-22.04', platform: linux/amd64 }
+
+    env: ${{ matrix.config.env }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.config.env }} -DEXTRA_OPTS=${{ matrix.config.extra_opts }}  
+
+      - name: Build
+        run: cmake --build build
+            
